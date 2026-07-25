@@ -1,3 +1,4 @@
+import 'dotenv/config';
 import { z } from 'zod';
 
 const envSchema = z.object({
@@ -6,11 +7,10 @@ const envSchema = z.object({
   JWT_SECRET: z.string(),
   JWT_EXPIRES_IN: z.string().default('1d'),
   REDIS_URL: z.string().optional(),
-  CLOUDINARY_CLOUD_NAME: z.string(),
-
-CLOUDINARY_API_KEY: z.string(),
-
-CLOUDINARY_API_SECRET: z.string(),
+  CLOUDINARY_CLOUD_NAME: z.string().optional().default(''),
+  CLOUDINARY_API_KEY: z.string().optional().default(''),
+  CLOUDINARY_API_SECRET: z.string().optional().default(''),
 });
 
 export const env = envSchema.parse(process.env);
+
