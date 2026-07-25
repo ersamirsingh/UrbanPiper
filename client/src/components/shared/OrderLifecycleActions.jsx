@@ -8,7 +8,7 @@ const onlineFlow = ['PENDING', 'ACCEPTED', 'PREPARING', 'READY', 'PICKED_UP', 'D
 const dineInFlow = ['PENDING', 'ACCEPTED', 'PREPARING', 'READY', 'SERVED', 'COMPLETED'];
 
 export const getNextStatus = (currentStatus, source, diningContext) => {
-  const isDineIn = ['DINE_IN', 'QR_DINE_IN', 'WAITER', 'POS', 'WEBSITE'].includes(source) || !!diningContext?.tableId;
+  const isDineIn = ['DINE_IN', 'QR_DINE_IN', 'WAITER', 'POS'].includes(source) || !!diningContext?.tableId;
   const flow = isDineIn ? dineInFlow : onlineFlow;
   const idx = flow.indexOf(currentStatus);
   return idx >= 0 && idx < flow.length - 1 ? flow[idx + 1] : null;

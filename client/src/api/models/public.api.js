@@ -62,3 +62,10 @@ export const listOutletCouponsApi = (outletSlug) =>
 
 export const mergeTablesApi = (data) =>
   api.post("/public/qr/merge-tables", data);
+
+export const getPublicLandingStatsApi = () =>
+  api.get("/public/stats");
+
+export const getPublicTeamApi = () =>
+  api.get("/public/team");
+

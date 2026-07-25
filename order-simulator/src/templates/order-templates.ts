@@ -1,5 +1,5 @@
 export interface OrderGeneratorOptions {
-  provider: 'MOCK_SWIGGY' | 'MOCK_ZOMATO' | 'WEBSITE';
+  provider: 'MOCK_SWIGGY' | 'MOCK_ZOMATO' | 'ONDC' | 'WHATSAPP';
   outletId?: string;
   presetName?: string;
 }
@@ -16,25 +16,25 @@ const PRESETS = [
   {
     name: 'Burger Feast',
     items: [
-      { id: 'item_101', title: 'Classic Cheese Burger', price: 249, qty: 2 },
-      { id: 'item_102', title: 'Crispy Peri Peri Fries', price: 129, qty: 1 },
-      { id: 'item_103', title: 'Cold Coffee Shake', price: 149, qty: 2 }
+      { id: 'item_101', title: 'Classic Cheese Burger', price: 249 },
+      { id: 'item_102', title: 'Crispy Peri Peri Fries', price: 129 },
+      { id: 'item_103', title: 'Cold Coffee Shake', price: 149 }
     ]
   },
   {
     name: 'Pizza Party',
     items: [
-      { id: 'item_201', title: 'Farmhouse Special Pizza 12"', price: 499, qty: 1 },
-      { id: 'item_202', title: 'Garlic Breadsticks', price: 159, qty: 1 },
-      { id: 'item_203', title: 'Choco Lava Cake', price: 119, qty: 2 }
+      { id: 'item_201', title: 'Farmhouse Special Pizza 12"', price: 499 },
+      { id: 'item_202', title: 'Garlic Breadsticks', price: 159 },
+      { id: 'item_203', title: 'Choco Lava Cake', price: 119 }
     ]
   },
   {
     name: 'Asian Express',
     items: [
-      { id: 'item_301', title: 'Hakka Noodles', price: 229, qty: 1 },
-      { id: 'item_302', title: 'Manchurian Gravy', price: 249, qty: 1 },
-      { id: 'item_303', title: 'Steamed Momos (8 pcs)', price: 179, qty: 1 }
+      { id: 'item_301', title: 'Hakka Noodles', price: 229 },
+      { id: 'item_302', title: 'Manchurian Gravy', price: 249 },
+      { id: 'item_303', title: 'Steamed Momos (8 pcs)', price: 179 }
     ]
   }
 ];
@@ -61,10 +61,7 @@ export function generateSwiggyOrderPayload(options: OrderGeneratorOptions): any 
       item_id: it.id,
       name: it.title,
       quantity: qty,
-      price: it.price,
-      addons: [
-        { addon_id: 'add_01', name: 'Extra Cheese', price: 30 }
-      ]
+      price: it.price
     };
   });
 
@@ -72,7 +69,7 @@ export function generateSwiggyOrderPayload(options: OrderGeneratorOptions): any 
   const deliveryFee = 40;
   const packagingFee = 0;
   const discount = Math.random() > 0.5 ? 50 : 0;
-  const totalAmount = subtotal + tax + deliveryFee - discount;
+  const totalAmount = subtotal + tax + deliveryFee + packagingFee - discount;
 
   return {
     order_id: orderId,
@@ -119,10 +116,7 @@ export function generateZomatoOrderPayload(options: OrderGeneratorOptions): any 
       itemId: it.id,
       title: it.title,
       qty,
-      rate: it.price,
-      extraAddons: [
-        { addonCode: 'add_z1', title: 'Spicy Dip', charge: 20 }
-      ]
+      rate: it.price
     };
   });
 
@@ -130,7 +124,7 @@ export function generateZomatoOrderPayload(options: OrderGeneratorOptions): any 
   const deliveryCharges = 35;
   const packingCharge = 0;
   const promoDiscount = Math.random() > 0.5 ? 40 : 0;
-  const totalBill = itemSubTotal + taxes + deliveryCharges - promoDiscount;
+  const totalBill = itemSubTotal + taxes + deliveryCharges + packingCharge - promoDiscount;
 
   return {
     orderId,
@@ -165,6 +159,20 @@ export function generateZomatoOrderPayload(options: OrderGeneratorOptions): any 
   };
 }
 
+export function generateOndcOrderPayload(options: OrderGeneratorOptions): any {
+  const payload = generateSwiggyOrderPayload(options);
+  payload.order_id = generateRandomId('ONDC');
+  payload.notes = 'ONDC buyer app simulation order';
+  return payload;
+}
+
+export function generateWhatsappOrderPayload(options: OrderGeneratorOptions): any {
+  const payload = generateSwiggyOrderPayload(options);
+  payload.order_id = generateRandomId('WA');
+  payload.notes = 'WhatsApp AI Bot simulation order';
+  return payload;
+}
+
 export function generateOrderPayload(options: OrderGeneratorOptions): { endpoint: string; payload: any } {
   let endpoint = '/integrations/mock/swiggy/orders';
   let payload: any;
@@ -172,8 +180,13 @@ export function generateOrderPayload(options: OrderGeneratorOptions): { endpoint
   if (options.provider === 'MOCK_ZOMATO') {
     endpoint = '/integrations/mock/zomato/orders';
     payload = generateZomatoOrderPayload(options);
+  } else if (options.provider === 'ONDC') {
+    endpoint = '/integrations/mock/swiggy/orders';
+    payload = generateOndcOrderPayload(options);
+  } else if (options.provider === 'WHATSAPP') {
+    endpoint = '/integrations/mock/swiggy/orders';
+    payload = generateWhatsappOrderPayload(options);
   } else {
-    // Default Swiggy Mock
     endpoint = '/integrations/mock/swiggy/orders';
     payload = generateSwiggyOrderPayload(options);
   }

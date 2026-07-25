@@ -4,24 +4,25 @@ Comprehensive food ordering, POS, KDS, and online integration platform with a st
 
 ---
 
-## 🐳 Running the Complete Stack with Docker (Recommended)
+## 🐳 Running the App Stack with Docker (Live Hot-Reloading Enabled)
 
-Run Frontend, Backend, MongoDB, Redis, and Order Simulator all together in Docker with a single command:
+Run Frontend, Backend Server, and Order Simulator in Docker with **Live Volume Mounting** enabled so any code change you save on your laptop automatically syncs inside Docker:
 
 ```bash
 # From omniserve root directory:
+cd omniserve
 docker compose up --build
 ```
 
 ### Services & Port Mappings
 
-| Service | Description | Access URL | Port |
-| :--- | :--- | :--- | :--- |
-| **Client** | OmniServe Admin & KDS Web App | `http://localhost:5173` | `5173` |
-| **Order Simulator** | Delayed & Batch Test Launcher | `http://localhost:5050` | `5050` |
-| **Server** | Backend API & WebSockets | `http://localhost:5000/api/v1` | `5000` |
-| **MongoDB** | Primary Database | `mongodb://localhost:27017` | `27017` |
-| **Redis** | In-Memory Cache & Adapter | `redis://localhost:6379` | `6379` |
+| Service | Container Name | Description | Access URL | Port |
+| :--- | :--- | :--- | :--- | :--- |
+| **Client** | `omniserve-frontend` | OmniServe Admin & KDS Web App | `http://localhost:5173` | `5173` |
+| **Order Simulator** | `omniserve-order-simulator` | Delayed & Batch Test Launcher | `http://localhost:5050` | `5050` |
+| **Server** | `omniserve-backend` | Backend API & WebSockets | `http://localhost:5000/api` | `5000` |
+
+> ⚡ **Live Hot-Reloading**: Changes saved in `./server/src`, `./order-simulator/src`, and `./order-simulator/public` are mounted live into the containers!
 
 ---
 

@@ -104,5 +104,40 @@ export const NOTIFICATION_TYPE_VARIANT = {
   GENERAL: 'neutral',
 };
 
-/* ── Order sources ── */
-export const ORDER_SOURCES = ['DINE_IN', 'TAKEAWAY', 'DELIVERY', 'ONLINE'];
+/* ── Offline In-Store Order Sources ── */
+export const OFFLINE_ORDER_SOURCES = ['WAITER', 'QR', 'POS', 'TAKEAWAY'];
+
+/* ── Online Platform Order Sources (Aggregators & Bots) ── */
+export const ONLINE_ORDER_SOURCES = ['SWIGGY', 'ZOMATO', 'ONDC', 'WHATSAPP'];
+
+export const ORDER_SOURCES = [
+  'WAITER', 'QR', 'POS', 'TAKEAWAY',
+  'SWIGGY', 'ZOMATO', 'ONDC', 'WHATSAPP'
+];
+
+export const ORDER_SOURCE_LABELS = {
+  WAITER: 'Waiter',
+  QR: 'QR Dine-In',
+  QR_DINE_IN: 'QR Dine-In',
+  POS: 'POS Counter',
+  TAKEAWAY: 'Takeaway',
+  SWIGGY: 'Swiggy',
+  ZOMATO: 'Zomato',
+  ONDC: 'ONDC',
+  WHATSAPP: 'WhatsApp',
+  DINE_IN: 'Dine-In',
+  DELIVERY: 'Delivery',
+  ONLINE: 'Online',
+};
+
+export const ORDER_SOURCE_BADGES = {
+  WAITER: 'info',
+  QR: 'primary',
+  QR_DINE_IN: 'primary',
+  POS: 'neutral',
+  TAKEAWAY: 'warning',
+  SWIGGY: 'warning',
+  ZOMATO: 'danger',
+  ONDC: 'info',
+  WHATSAPP: 'success',
+};

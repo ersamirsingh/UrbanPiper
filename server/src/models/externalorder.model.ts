@@ -8,7 +8,7 @@ export interface IExternalOrder extends Document {
   tenantId: Types.ObjectId;
   outletId: Types.ObjectId | null;
   connectionId: Types.ObjectId | null;
-  provider: IntegrationProvider;
+  provider: IntegrationProvider | string;
   externalOrderId: string;
   externalDisplayId: string | null;
   internalOrderId: Types.ObjectId | null;

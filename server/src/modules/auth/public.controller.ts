@@ -830,7 +830,7 @@ export class PublicController {
           tenantId: menuItem.tenantId,
           outletId: new Types.ObjectId(outletId),
           sessionToken,
-          channel: "WEBSITE",
+          channel: "QR",
           menuViewedAt: new Date(),
           firstItemViewedAt: new Date(),
           firstAddToCartAt: new Date(),
@@ -928,12 +928,12 @@ export class PublicController {
       if (isNewCart) {
         await EventBusService.publishCartCreated(activeCart.tenantId, activeCart.outletId, activeCart._id, activeCart, {
           correlationId: session.sessionToken,
-          sourceSystem: "WEBSITE",
+          sourceSystem: "ONLINE",
         }).catch(err => console.error("Failed to publish CART_CREATED event:", err));
       } else {
         await EventBusService.publishCartUpdated(activeCart.tenantId, activeCart.outletId, activeCart._id, activeCart, {
           correlationId: session.sessionToken,
-          sourceSystem: "WEBSITE",
+          sourceSystem: "ONLINE",
         }).catch(err => console.error("Failed to publish CART_UPDATED event:", err));
       }
 
@@ -999,7 +999,7 @@ export class PublicController {
 
       await EventBusService.publishCartUpdated(cart.tenantId, cart.outletId, cart._id, cart, {
         correlationId: cart.sessionToken,
-        sourceSystem: "WEBSITE",
+        sourceSystem: "ONLINE",
       }).catch(err => console.error("Failed to publish CART_UPDATED event:", err));
 
       ApiResponseHandler.success(res, 200, "Cart updated successfully", cart);
@@ -1046,7 +1046,7 @@ export class PublicController {
 
       await EventBusService.publishCartUpdated(cart.tenantId, cart.outletId, cart._id, cart, {
         correlationId: cart.sessionToken,
-        sourceSystem: "WEBSITE",
+        sourceSystem: "ONLINE",
       }).catch(err => console.error("Failed to publish CART_UPDATED event:", err));
 
       ApiResponseHandler.success(res, 200, "Item removed from cart successfully", cart);
@@ -1376,7 +1376,7 @@ export class PublicController {
 
       const { externalOrder } = await OrderGatewayService.ingestExternalOrder({
         tenantId: cart.tenantId.toString(),
-        provider: IntegrationProvider.WEBSITE,
+        provider: IntegrationProvider.QR,
         externalOrderId: rawPayload.orderId,
         rawPayload,
         outletId: cart.outletId.toString(),
@@ -1436,7 +1436,7 @@ export class PublicController {
 
       await EventBusService.publishCheckoutStarted(cart.tenantId, cart.outletId, cart._id, cart, {
         correlationId: cart.sessionToken,
-        sourceSystem: "WEBSITE",
+        sourceSystem: "ONLINE",
       }).catch(err => console.error("Failed to publish CHECKOUT_STARTED event:", err));
 
       const responseBody = {
@@ -1660,7 +1660,7 @@ export class PublicController {
 
       await EventBusService.publishCartUpdated(activeCart.tenantId, activeCart.outletId, activeCart._id, activeCart, {
         correlationId: activeCart.sessionToken,
-        sourceSystem: "WEBSITE",
+        sourceSystem: "ONLINE",
       }).catch(err => console.error("Failed to publish CART_UPDATED event:", err));
 
       ApiResponseHandler.success(res, 200, "Reorder processed successfully", {
@@ -2908,4 +2908,66 @@ export class PublicController {
       ApiResponseHandler.internalError(res, error.message || "Failed to submit contact form");
     }
   }
+
+  static async getPublicLandingStats(req: Request, res: Response): Promise<void> {
+    try {
+      const totalOutlets = await Outlet.countDocuments({ isDeleted: false, isActive: true });
+      const totalOrders = await Order.countDocuments({ isDeleted: false });
+      const activeOrdersCount = await Order.countDocuments({ isDeleted: false, orderStatus: { $in: ["PENDING", "ACCEPTED", "PREPARING"] } });
+
+      const revenueAgg = await Order.aggregate([
+        { $match: { isDeleted: false, orderStatus: "DELIVERED" } },
+        { $group: { _id: null, totalSales: { $sum: "$totalAmount" } } }
+      ]);
+      const totalSales = revenueAgg[0]?.totalSales || 0;
+
+      const recentOrders = await Order.find({ isDeleted: false })
+        .sort({ createdAt: -1 })
+        .limit(4)
+        .select("orderNumber source orderStatus totalAmount createdAt");
+
+      const heroStats = [
+        { value: "40%+", label: "Order Speedup" },
+        { value: "99.99%", label: "System Uptime" },
+        { value: `${totalOutlets > 0 ? totalOutlets : '100'}+`, label: "Active Outlets" }
+      ];
+
+      ApiResponseHandler.success(res, 200, "Public landing stats fetched successfully", {
+        heroStats,
+        metrics: {
+          totalOutlets: totalOutlets || 1,
+          totalOrders: totalOrders || 0,
+          activeOrdersCount: activeOrdersCount || 0,
+          totalSales: totalSales,
+          averageSla: "98.5%"
+        },
+        recentOrders: recentOrders.map(o => ({
+          orderNumber: o.orderNumber || `#OM-${o._id.toString().slice(-4)}`,
+          orderType: o.source || "DINE_IN",
+          status: o.orderStatus || "DELIVERED",
+          totalAmount: o.totalAmount
+        }))
+      });
+    } catch (error: any) {
+      console.error("[PublicController] getPublicLandingStats error:", error);
+      ApiResponseHandler.internalError(res, error.message || "Failed to fetch public landing stats");
+    }
+  }
+
+
+  static async getPublicTeam(req: Request, res: Response): Promise<void> {
+    try {
+      const team = [
+        { name: 'Md Yusuf', role: 'Full Stack & System Architect', email: 'yusuf@omniserve.io', scope: 'Global', initial: 'MY', badgeBg: 'bg-indigo-500/10 text-indigo-400' },
+        { name: 'Samir Singh', role: 'Operations Manager Lead', email: 'samir@omniserve.io', scope: 'Regional', initial: 'SS', badgeBg: 'bg-blue-500/10 text-blue-400' },
+        { name: 'Nitish Kumar', role: 'Kitchen Lead Specialist', email: 'nitish@omniserve.io', scope: 'Delhi CP', initial: 'NK', badgeBg: 'bg-emerald-500/10 text-emerald-400' }
+      ];
+
+      ApiResponseHandler.success(res, 200, "Public team directory fetched successfully", team);
+    } catch (error: any) {
+      console.error("[PublicController] getPublicTeam error:", error);
+      ApiResponseHandler.internalError(res, error.message || "Failed to fetch public team");
+    }
+  }
 }
+

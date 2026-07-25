@@ -12,7 +12,7 @@ const __dirname = path.dirname(__filename);
 
 const app = express();
 const PORT = process.env.PORT || 5050;
-const defaultApiUrl = process.env.OMNISERVE_API_URL || 'http://localhost:5000/api/v1';
+const defaultApiUrl = process.env.OMNISERVE_API_URL || 'http://localhost:5000/api';
 
 app.use(cors());
 app.use(express.json());

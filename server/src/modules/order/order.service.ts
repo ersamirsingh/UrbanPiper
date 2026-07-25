@@ -47,15 +47,7 @@ export class OrderService {
       });
     }
     if (!outlet) {
-      outlet = await Outlet.create({
-        _id: outletObjectId,
-        tenantId: tenantObjectId,
-        name: "Main Outlet",
-        code: "MAIN01",
-        phone: "9876543210",
-        address: { line1: "123 Main St", city: "Metropolis", state: "State", pincode: "400001" },
-        status: "ACTIVE",
-      });
+      throw new Error(`Outlet ${outletId} not found for tenant ${tenantId}`);
     }
 
     for (const item of items) {
@@ -74,18 +66,10 @@ export class OrderService {
         });
       }
       if (!menuItem) {
-        menuItem = await MenuItem.create({
-          _id: new Types.ObjectId(item.menuItemId),
-          tenantId: tenantObjectId,
-          outletId: outlet._id,
-          name: item.name || "Special Item",
-          price: item.unitPrice || 199,
-          isActive: true,
-          isDeleted: false,
-        });
+        throw new Error(`MenuItem ${item.menuItemId} not found for tenant ${tenantId}`);
       }
 
-      if (item.variantId) {
+      if (item.variantId && Types.ObjectId.isValid(item.variantId)) {
         const variant = await Variant.findOne({
           _id: new Types.ObjectId(item.variantId),
           menuItemId: menuItem._id,
@@ -93,20 +77,22 @@ export class OrderService {
           isDeleted: false,
         });
         if (!variant) {
-          throw new Error(`Variant not found for MenuItem ${item.name}`);
+          console.warn(`[OrderService] Variant ${item.variantId} not found for MenuItem ${item.name}`);
         }
       }
 
       if (item.addons && item.addons.length > 0) {
         for (const ad of item.addons) {
-          const addon = await Addon.findOne({
-            _id: new Types.ObjectId(ad.addonId),
-            menuItemId: menuItem._id,
-            tenantId: tenantObjectId,
-            isDeleted: false,
-          });
-          if (!addon) {
-            throw new Error(`Addon ${ad.name} not found for MenuItem ${item.name}`);
+          if (ad.addonId && Types.ObjectId.isValid(ad.addonId)) {
+            const addon = await Addon.findOne({
+              _id: new Types.ObjectId(ad.addonId),
+              menuItemId: menuItem._id,
+              tenantId: tenantObjectId,
+              isDeleted: false,
+            });
+            if (!addon) {
+              console.warn(`[OrderService] Addon ${ad.name} not found for MenuItem ${item.name}`);
+            }
           }
         }
       }
@@ -279,7 +265,7 @@ export class OrderService {
     if (filters.operationalMode === 'ONLINE') {
       query.source = { $in: ["SWIGGY", "ZOMATO", "ONLINE", "DELIVERY", "TAKEAWAY", "ONDC", "WHATSAPP"] };
     } else if (filters.operationalMode === 'DINE_IN') {
-      query.source = { $in: ["DINE_IN", "QR_DINE_IN", "WAITER", "POS", "WEBSITE"] };
+      query.source = { $in: ["DINE_IN", "QR_DINE_IN", "WAITER", "POS"] };
     }
 
     if (filters.date) {
@@ -358,7 +344,7 @@ export class OrderService {
 
     const currentStatus = order.orderStatus;
 
-    const isDineIn = ["DINE_IN", "QR_DINE_IN", "WAITER", "POS", "WEBSITE"].includes(order.source) || !!order.diningContext?.tableId;
+    const isDineIn = ["DINE_IN", "QR_DINE_IN", "WAITER", "POS"].includes(order.source) || !!order.diningContext?.tableId;
 
     let validTransitions: Record<string, string>;
     if (isDineIn) {

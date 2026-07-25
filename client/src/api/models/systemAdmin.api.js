@@ -13,8 +13,9 @@ export const revokeInviteApi = (id) => {
 };
 
 export const acceptInviteApi = (payload) => {
-  return api.post('/system-admin/invites/accept', payload);
+  return api.post('/system-admin/accept-invite', payload);
 };
+
 
 export const listTenantsApi = (params) => {
   return api.get('/system-admin/tenants', { params });

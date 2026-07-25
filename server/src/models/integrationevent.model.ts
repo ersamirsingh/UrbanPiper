@@ -9,7 +9,7 @@ export interface IIntegrationEvent extends Document {
   tenantId: Types.ObjectId;
   outletId: Types.ObjectId | null;
   connectionId: Types.ObjectId | null;
-  provider: IntegrationProvider;
+  provider: IntegrationProvider | string;
   direction: IntegrationEventDirection;
   eventType: string;
   externalEventId: string | null;

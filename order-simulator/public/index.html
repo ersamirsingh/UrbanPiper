@@ -75,7 +75,7 @@
 
         <div>
           <label class="block text-xs font-medium text-slate-300 mb-1">Target OmniServe API URL</label>
-          <input type="text" id="apiUrlInput" value="http://localhost:5000/api/v1" class="w-full px-3.5 py-2.5 rounded-xl glass-input text-xs font-mono">
+          <input type="text" id="apiUrlInput" value="http://localhost:5000/api" class="w-full px-3.5 py-2.5 rounded-xl glass-input text-xs font-mono">
         </div>
 
         <div>
@@ -108,18 +108,26 @@
           <!-- Provider Channel Selector -->
           <div>
             <label class="block text-xs font-medium text-slate-300 mb-2">Order Provider Channel</label>
-            <div class="grid grid-cols-3 gap-2">
-              <button type="button" onclick="setProvider('MOCK_SWIGGY')" id="btnProviderSwiggy" class="provider-btn py-2.5 px-3 rounded-xl border border-indigo-500 bg-indigo-600/30 text-xs font-bold text-white flex flex-col items-center gap-1 transition">
+            <div class="grid grid-cols-2 md:grid-cols-5 gap-2">
+              <button type="button" onclick="setProvider('MOCK_SWIGGY')" id="btnProviderSwiggy" class="provider-btn py-2.5 px-2 rounded-xl border border-indigo-500 bg-indigo-600/30 text-xs font-bold text-white flex flex-col items-center gap-0.5 transition">
                 <span>🟠 Swiggy</span>
-                <span class="text-[10px] opacity-75 font-normal">Mock Delivery</span>
+                <span class="text-[9px] opacity-75 font-normal">Delivery</span>
               </button>
-              <button type="button" onclick="setProvider('MOCK_ZOMATO')" id="btnProviderZomato" class="provider-btn py-2.5 px-3 rounded-xl border border-white/10 bg-slate-800 text-xs font-bold text-slate-300 flex flex-col items-center gap-1 transition hover:bg-slate-700">
+              <button type="button" onclick="setProvider('MOCK_ZOMATO')" id="btnProviderZomato" class="provider-btn py-2.5 px-2 rounded-xl border border-white/10 bg-slate-800 text-xs font-bold text-slate-300 flex flex-col items-center gap-0.5 transition hover:bg-slate-700">
                 <span>🔴 Zomato</span>
-                <span class="text-[10px] opacity-75 font-normal">Mock Delivery</span>
+                <span class="text-[9px] opacity-75 font-normal">Delivery</span>
               </button>
-              <button type="button" onclick="setProvider('MIXED')" id="btnProviderMixed" class="provider-btn py-2.5 px-3 rounded-xl border border-white/10 bg-slate-800 text-xs font-bold text-slate-300 flex flex-col items-center gap-1 transition hover:bg-slate-700">
+              <button type="button" onclick="setProvider('ONDC')" id="btnProviderOndc" class="provider-btn py-2.5 px-2 rounded-xl border border-white/10 bg-slate-800 text-xs font-bold text-slate-300 flex flex-col items-center gap-0.5 transition hover:bg-slate-700">
+                <span>🔵 ONDC</span>
+                <span class="text-[9px] opacity-75 font-normal">Network</span>
+              </button>
+              <button type="button" onclick="setProvider('WHATSAPP')" id="btnProviderWhatsapp" class="provider-btn py-2.5 px-2 rounded-xl border border-white/10 bg-slate-800 text-xs font-bold text-slate-300 flex flex-col items-center gap-0.5 transition hover:bg-slate-700">
+                <span>🟢 WhatsApp</span>
+                <span class="text-[9px] opacity-75 font-normal">AI Bot</span>
+              </button>
+              <button type="button" onclick="setProvider('MIXED')" id="btnProviderMixed" class="provider-btn py-2.5 px-2 rounded-xl border border-white/10 bg-slate-800 text-xs font-bold text-slate-300 flex flex-col items-center gap-0.5 transition hover:bg-slate-700">
                 <span>🔀 Mixed</span>
-                <span class="text-[10px] opacity-75 font-normal">50% Swiggy/Zomato</span>
+                <span class="text-[9px] opacity-75 font-normal">Random</span>
               </button>
             </div>
           </div>
@@ -230,6 +238,8 @@
       });
       const activeBtn = provider === 'MOCK_SWIGGY' ? document.getElementById('btnProviderSwiggy') :
                         provider === 'MOCK_ZOMATO' ? document.getElementById('btnProviderZomato') :
+                        provider === 'ONDC' ? document.getElementById('btnProviderOndc') :
+                        provider === 'WHATSAPP' ? document.getElementById('btnProviderWhatsapp') :
                         document.getElementById('btnProviderMixed');
       if (activeBtn) {
         activeBtn.classList.remove('border-white/10', 'bg-slate-800', 'text-slate-300');
@@ -312,17 +322,30 @@
       }
     }
 
+    let pollIntervalTimer = null;
+
     async function fetchTasks() {
       try {
         const response = await fetch('/api/simulator/tasks');
         const data = await response.json();
         if (data.success) {
-          renderActiveTimers(data.active || []);
+          const activeTasks = data.active || [];
+          renderActiveTimers(activeTasks);
           renderHistory(data.history || []);
+
+          scheduleNextPoll(activeTasks.length > 0 ? 1000 : 4000);
+        } else {
+          scheduleNextPoll(5000);
         }
       } catch (err) {
         console.error('Failed to fetch tasks:', err);
+        scheduleNextPoll(5000);
       }
+    }
+
+    function scheduleNextPoll(delayMs) {
+      if (pollIntervalTimer) clearTimeout(pollIntervalTimer);
+      pollIntervalTimer = setTimeout(fetchTasks, delayMs);
     }
 
     function renderActiveTimers(activeTasks) {
@@ -343,7 +366,9 @@
       container.innerHTML = activeTasks.map(task => {
         const percent = Math.max(0, Math.min(100, 100 - (task.remainingSeconds / task.delaySeconds) * 100));
         const providerEmoji = task.provider === 'MOCK_SWIGGY' ? '🟠 Swiggy' :
-                              task.provider === 'MOCK_ZOMATO' ? '🔴 Zomato' : '🔀 Mixed';
+                              task.provider === 'MOCK_ZOMATO' ? '🔴 Zomato' :
+                              task.provider === 'ONDC' ? '🔵 ONDC' :
+                              task.provider === 'WHATSAPP' ? '🟢 WhatsApp' : '🔀 Mixed';
 
         return `
           <div class="glass-card rounded-2xl p-5 border border-indigo-500/30 relative overflow-hidden space-y-3">
@@ -424,8 +449,7 @@
       }).join('');
     }
 
-    // Auto Refresh Task Data
-    setInterval(fetchTasks, 1000);
+    // Initialize Dashboard
     fetchTasks();
   </script>
 </body>

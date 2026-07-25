@@ -70,7 +70,7 @@ OmniServe
 ## 4. Workspaces & Operational Classification (Phase 3 Split)
 
 * **Online Cockpit** (`/operations/online`): Dedicated board for online aggregator and digital channel orders. Filters by:
-  `["SWIGGY", "ZOMATO", "WEBSITE", "ONLINE", "DELIVERY", "TAKEAWAY", "ONDC", "WHATSAPP"]`
+  `["SWIGGY", "ZOMATO", "ONLINE", "DELIVERY", "TAKEAWAY", "ONDC", "WHATSAPP"]`
 * **Dine-In Cockpit** (`/operations/dine-in`): Dedicated tabbed view (Live Floor, KDS, waiter, etc.) with a new Dine-In Orders tab. Filters by:
   `["DINE_IN", "QR_DINE_IN", "WAITER", "POS"]`
 * **Compatibility Routing**: `/orders` is preserved in `mode="ALL"` to keep external deep links from notification systems functioning correctly.

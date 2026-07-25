@@ -3,7 +3,7 @@ import { generateOrderPayload } from '../templates/order-templates.js';
 
 export interface ScheduleTaskParams {
   tenantId: string;
-  provider: 'MOCK_SWIGGY' | 'MOCK_ZOMATO' | 'MIXED';
+  provider: 'MOCK_SWIGGY' | 'MOCK_ZOMATO' | 'ONDC' | 'WHATSAPP' | 'MIXED';
   orderCount: number;
   delaySeconds: number;
   apiUrl?: string;
@@ -22,7 +22,7 @@ export interface TaskResultItem {
 export interface ScheduledTask {
   id: string;
   tenantId: string;
-  provider: 'MOCK_SWIGGY' | 'MOCK_ZOMATO' | 'MIXED';
+  provider: 'MOCK_SWIGGY' | 'MOCK_ZOMATO' | 'ONDC' | 'WHATSAPP' | 'MIXED';
   orderCount: number;
   delaySeconds: number;
   scheduledAt: string;
@@ -37,7 +37,7 @@ export interface ScheduledTask {
 class SchedulerService {
   private tasks: Map<string, ScheduledTask> = new Map();
   private history: ScheduledTask[] = [];
-  private defaultApiUrl: string = process.env.OMNISERVE_API_URL || 'http://localhost:5000/api/v1';
+  private defaultApiUrl: string = process.env.OMNISERVE_API_URL || 'http://localhost:5000/api';
 
   constructor() {
     setInterval(() => {
@@ -89,11 +89,12 @@ class SchedulerService {
     const dispatchPromises: Promise<TaskResultItem>[] = [];
 
     for (let i = 0; i < task.orderCount; i++) {
-      let chosenProvider: 'MOCK_SWIGGY' | 'MOCK_ZOMATO' = 'MOCK_SWIGGY';
+      let chosenProvider: 'MOCK_SWIGGY' | 'MOCK_ZOMATO' | 'ONDC' | 'WHATSAPP' = 'MOCK_SWIGGY';
       if (task.provider === 'MIXED') {
-        chosenProvider = Math.random() > 0.5 ? 'MOCK_SWIGGY' : 'MOCK_ZOMATO';
+        const options: Array<'MOCK_SWIGGY' | 'MOCK_ZOMATO' | 'ONDC' | 'WHATSAPP'> = ['MOCK_SWIGGY', 'MOCK_ZOMATO', 'ONDC', 'WHATSAPP'];
+        chosenProvider = options[Math.floor(Math.random() * options.length)]!;
       } else {
-        chosenProvider = task.provider;
+        chosenProvider = task.provider as any;
       }
 
       const { endpoint, payload } = generateOrderPayload({
@@ -102,7 +103,8 @@ class SchedulerService {
       });
 
       const orderId = payload.order_id || payload.orderId || `ORDER_${i + 1}`;
-      const targetUrl = `${apiUrl.replace(/\/$/, '')}${endpoint}?tenantId=${task.tenantId}`;
+      const cleanApiUrl = (apiUrl || this.defaultApiUrl).replace(/\/$/, '');
+      const targetUrl = `${cleanApiUrl}${endpoint}?tenantId=${task.tenantId}`;
 
       const promise = axios
         .post(targetUrl, payload, {

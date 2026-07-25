@@ -5,7 +5,7 @@ import Tenant from "../../../src/models/tenant.model.js";
 import User from "../../../src/models/user.model.js";
 import Outlet from "../../../src/models/outlet.model.js";
 import Table from "../../../src/models/table.model.js";
-import MenuItem from "../../../src/models/menuitems.model.js";
+import MenuItem from "../../../src/models/menuItem.model.js";
 import Category from "../../../src/models/category.model.js";
 import QRSession from "../../../src/models/qrsession.model.js";
 import GuestSession from "../../../src/models/guestsession.model.js";

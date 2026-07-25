@@ -140,7 +140,7 @@ const integrationEventQueueSchema = new Schema<IIntegrationEventQueue>(
     sourceSystem: {
       type: String,
       required: [true, "Source system is required"],
-      enum: ["QR", "SWIGGY", "ZOMATO", "WEBSITE", "POS", "SYSTEM", "QR_DINE_IN", "DINE_IN", "TAKEAWAY", "DELIVERY", "ONLINE", "ONDC", "WHATSAPP", "WAITER"],
+      enum: ["QR", "SWIGGY", "ZOMATO", "POS", "SYSTEM", "QR_DINE_IN", "DINE_IN", "TAKEAWAY", "DELIVERY", "ONLINE", "ONDC", "WHATSAPP", "WAITER"],
       trim: true,
     },
     queuedAt: {

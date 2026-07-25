@@ -14,11 +14,11 @@ export class MappingResolutionService {
     externalOutletId: string
   ): Promise<string> {
     const prov = String(provider).toUpperCase();
-    if (prov === "QR" || prov === "WEBSITE" || prov === "POS" || prov === "QR_DINE_IN") {
+    if (prov === "QR" || prov === "POS" || prov === "QR_DINE_IN") {
       return externalOutletId;
     }
 
-    if (prov.startsWith("MOCK") && externalOutletId && Types.ObjectId.isValid(externalOutletId)) {
+    if (externalOutletId && Types.ObjectId.isValid(externalOutletId)) {
       return externalOutletId;
     }
 
@@ -31,11 +31,9 @@ export class MappingResolutionService {
     });
 
     if (!mapping) {
-      if (prov.startsWith("MOCK")) {
-        const fallbackOutlet = await Outlet.findOne({ tenantId: new Types.ObjectId(tenantId), isDeleted: false });
-        if (fallbackOutlet) {
-          return fallbackOutlet._id.toString();
-        }
+      const fallbackOutlet = await Outlet.findOne({ tenantId: new Types.ObjectId(tenantId), isDeleted: false });
+      if (fallbackOutlet) {
+        return fallbackOutlet._id.toString();
       }
       throw new Error(`MAPPING_ERROR: Outlet mapping missing for external outlet ID: ${externalOutletId}`);
     }
@@ -50,11 +48,11 @@ export class MappingResolutionService {
     externalItemId: string
   ): Promise<string> {
     const prov = String(provider).toUpperCase();
-    if (prov === "QR" || prov === "WEBSITE" || prov === "POS" || prov === "QR_DINE_IN") {
+    if (prov === "QR" || prov === "POS" || prov === "QR_DINE_IN") {
       return externalItemId;
     }
 
-    if (prov.startsWith("MOCK") && externalItemId && Types.ObjectId.isValid(externalItemId)) {
+    if (externalItemId && Types.ObjectId.isValid(externalItemId)) {
       return externalItemId;
     }
 
@@ -68,11 +66,9 @@ export class MappingResolutionService {
     });
 
     if (!mapping) {
-      if (prov.startsWith("MOCK")) {
-        const fallbackItem = await MenuItem.findOne({ tenantId: new Types.ObjectId(tenantId), isDeleted: false });
-        if (fallbackItem) {
-          return fallbackItem._id.toString();
-        }
+      const fallbackItem = await MenuItem.findOne({ tenantId: new Types.ObjectId(tenantId), isDeleted: false });
+      if (fallbackItem) {
+        return fallbackItem._id.toString();
       }
       throw new Error(`MAPPING_ERROR: Item mapping missing for external item ID: ${externalItemId}`);
     }
@@ -87,7 +83,11 @@ export class MappingResolutionService {
     externalVariantId: string
   ): Promise<string> {
     const prov = String(provider).toUpperCase();
-    if (prov === "QR" || prov === "WEBSITE" || prov === "POS" || prov === "QR_DINE_IN") {
+    if (prov === "QR" || prov === "POS" || prov === "QR_DINE_IN") {
+      return externalVariantId;
+    }
+
+    if (externalVariantId && Types.ObjectId.isValid(externalVariantId)) {
       return externalVariantId;
     }
 
@@ -101,10 +101,7 @@ export class MappingResolutionService {
     });
 
     if (!mapping) {
-      if (prov.startsWith("MOCK")) {
-        return externalVariantId;
-      }
-      throw new Error(`MAPPING_ERROR: Variant mapping missing for external variant ID: ${externalVariantId}`);
+      return externalVariantId;
     }
 
     return mapping.variantId.toString();
@@ -117,7 +114,11 @@ export class MappingResolutionService {
     externalAddonId: string
   ): Promise<string> {
     const prov = String(provider).toUpperCase();
-    if (prov === "QR" || prov === "WEBSITE" || prov === "POS" || prov === "QR_DINE_IN") {
+    if (prov === "QR" || prov === "POS" || prov === "QR_DINE_IN") {
+      return externalAddonId;
+    }
+
+    if (externalAddonId && Types.ObjectId.isValid(externalAddonId)) {
       return externalAddonId;
     }
 
@@ -131,10 +132,7 @@ export class MappingResolutionService {
     });
 
     if (!mapping) {
-      if (prov.startsWith("MOCK")) {
-        return externalAddonId;
-      }
-      throw new Error(`MAPPING_ERROR: Addon mapping missing for external addon ID: ${externalAddonId}`);
+      return externalAddonId;
     }
 
     return mapping.addonId.toString();

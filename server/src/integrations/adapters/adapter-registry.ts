@@ -22,7 +22,7 @@ localRegistry.set(IntegrationProvider.SWIGGY, mockSwiggy);
 localRegistry.set(IntegrationProvider.MOCK_ZOMATO, mockZomato);
 localRegistry.set(IntegrationProvider.ZOMATO, mockZomato);
 localRegistry.set(IntegrationProvider.QR, qrAdapter);
-localRegistry.set(IntegrationProvider.WEBSITE, websiteAdapter);
+localRegistry.set("WEBSITE", websiteAdapter);
 
 export function getAdapter(provider: string): IntegrationAdapter {
   const key = String(provider).toUpperCase();

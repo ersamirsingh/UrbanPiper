@@ -3,7 +3,7 @@ import app from "../../../src/app.js";
 import { connectTestDB, closeTestDB } from "../shared/shared-utils.js";
 import Tenant from "../../../src/models/tenant.model.js";
 import Outlet from "../../../src/models/outlet.model.js";
-import MenuItem from "../../../src/models/menuitems.model.js";
+import MenuItem from "../../../src/models/menuItem.model.js";
 import Category from "../../../src/models/category.model.js";
 import ExternalOrder from "../../../src/models/externalorder.model.js";
 import Order from "../../../src/models/order.model.js";

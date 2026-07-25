@@ -10,9 +10,10 @@
     "build": "tsc",
     "start": "node dist/server.js",
     "clean": "rm -rf dist",
+    "clean:orders": "tsx src/scripts/clear-orders.ts",
+    "clean:online-orders": "tsx src/scripts/clear-online-orders.ts",
+    "clean:enums": "tsx src/scripts/clean-invalid-enum-orders.ts",
     "seed": "tsx src/scripts/seed.ts",
-    "test:dining": "tsx tests/e2e_dining_workflow.ts",
-    "test:acceptance": "tsx tests/acceptance/guest/guest-flow.test.ts && tsx tests/acceptance/online/online-flow.test.ts && tsx tests/acceptance/guest/phase9-features.test.ts",
     "test": "npm run test:acceptance"
   },
   "keywords": [

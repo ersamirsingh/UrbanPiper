@@ -18,10 +18,10 @@ WORKDIR /app
 
 ENV NODE_ENV=production
 ENV PORT=5050
-ENV OMNISERVE_API_URL=http://host.docker.internal:5000/api/v1
+ENV OMNISERVE_API_URL=http://server:5000/api
 
 COPY package*.json ./
-RUN npm ci --only=production
+RUN npm ci --omit=dev
 
 COPY --from=builder /app/dist ./dist
 COPY --from=builder /app/public ./public

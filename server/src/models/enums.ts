@@ -95,18 +95,23 @@ export enum PaymentMethod {
 }
 
 export enum OrderSource {
-  DINE_IN = "DINE_IN",
-  TAKEAWAY = "TAKEAWAY",
-  DELIVERY = "DELIVERY",
-  ONLINE = "ONLINE",
+  // Offline In-Store & Staff Channels
+  WAITER = "WAITER",
+  QR = "QR",
   QR_DINE_IN = "QR_DINE_IN",
+  POS = "POS",
+  TAKEAWAY = "TAKEAWAY",
+
+  // Online Platform Channels (Aggregators & Bots)
   SWIGGY = "SWIGGY",
   ZOMATO = "ZOMATO",
-  POS = "POS",
-  WEBSITE = "WEBSITE",
   ONDC = "ONDC",
   WHATSAPP = "WHATSAPP",
-  WAITER = "WAITER",
+
+  // Core Fallbacks
+  DINE_IN = "DINE_IN",
+  DELIVERY = "DELIVERY",
+  ONLINE = "ONLINE",
 }
 
 export enum ReviewSource {

@@ -8,7 +8,6 @@ export enum IntegrationProvider {
   ZOMATO = "ZOMATO",
   ONDC = "ONDC",
   MAGICPIN = "MAGICPIN",
-  WEBSITE = "WEBSITE",
   WHATSAPP = "WHATSAPP",
   PORTER = "PORTER",
   DUNZO = "DUNZO",
@@ -72,7 +71,6 @@ export enum SyncJobStatus {
 
 export type CanonicalOrderSource =
   | "QR_DINE_IN"
-  | "WEBSITE"
   | "POS"
   | "WAITER"
   | "MOCK_SWIGGY"

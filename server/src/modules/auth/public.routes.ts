@@ -45,5 +45,8 @@ publicRouter.post("/qr/guest/session/leave", PublicController.leaveGuestSession)
 publicRouter.post("/orders/:orderId/items/:itemId/cancel", PublicController.cancelOrderItem);
 
 publicRouter.post("/contact", PublicController.submitContactForm);
+publicRouter.get("/stats", PublicController.getPublicLandingStats);
+publicRouter.get("/team", PublicController.getPublicTeam);
 
 export default publicRouter;
+

@@ -25,6 +25,8 @@ const adminGeneralLimiter = rateLimiter({
 });
 
 router.post('/accept-invite', acceptInviteLimiter, SystemAdminController.acceptInvite);
+router.post('/invites/accept', acceptInviteLimiter, SystemAdminController.acceptInvite);
+
 
 router.use(verifyToken);
 router.use(requireSystemAdmin);

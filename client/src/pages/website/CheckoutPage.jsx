@@ -471,8 +471,9 @@ export default function CheckoutPage() {
                   className="w-4 h-4 accent-primary"
                 />
                 <div>
-                  <p className="text-sm font-semibold text-on-surface">Mock Net Banking / Cards</p>
-                  <p className="text-xs text-on-surface-variant mt-0.5">Simulate instant online payment</p>
+                  <p className="text-sm font-semibold text-on-surface">Online Payment (Cards & NetBanking)</p>
+                  <p className="text-xs text-on-surface-variant mt-0.5">Pay via Credit/Debit card, UPI or NetBanking</p>
+
                 </div>
               </label>
             </div>

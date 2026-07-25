@@ -26,7 +26,7 @@ import { PaymentService } from "../payment/payment.service.js";
 
 interface IngestExternalOrderInput {
   tenantId: string;
-  provider: IntegrationProvider;
+  provider: IntegrationProvider | string;
   externalOrderId: string;
   rawPayload: unknown;
   externalDisplayId?: string | undefined;
@@ -587,7 +587,6 @@ export class OrderGatewayService {
     if (provStr === "SWIGGY" || provStr === "MOCK_SWIGGY") return OrderSource.SWIGGY;
     if (provStr === "ZOMATO" || provStr === "MOCK_ZOMATO") return OrderSource.ZOMATO;
     if (provStr === "POS") return OrderSource.POS;
-    if (provStr === "WEBSITE") return OrderSource.WEBSITE;
 
     if (canonicalOrder.fulfillment.type === "DINE_IN") return OrderSource.DINE_IN;
     if (canonicalOrder.fulfillment.type === "TAKEAWAY") return OrderSource.TAKEAWAY;
@@ -721,7 +720,7 @@ export class OrderGatewayService {
     tenantId: string;
     outletId?: string | undefined;
     connectionId?: string | undefined;
-    provider: IntegrationProvider;
+    provider: IntegrationProvider | string;
     eventType: string;
     externalOrderId?: string | undefined;
     externalOrderRef?: Types.ObjectId;
