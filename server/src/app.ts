@@ -1,4 +1,4 @@
-import express, { Express } from 'express';
+import express, { Express, Request, Response } from 'express';
 import cookieParser from 'cookie-parser';
 import cors from 'cors';
 import helmet from 'helmet';
@@ -8,8 +8,6 @@ import { initWorkerRegistry } from './jobs/register-workers.js';
 initWorkerRegistry();
 import { errorHandler } from './middlewares/error.middleware.js';
 import { rateLimiter } from './middlewares/rateLimiter.middleware.js';
-import { HealthController } from './modules/health/health.controller.js';
-
 
 const app: Express = express();
 
@@ -35,9 +33,16 @@ app.use(cors({
 }));
 
 app.use(express.json());
-app.use(cookieParser())
+app.use(cookieParser());
 
-app.get("/health", HealthController.getPublicHealth);
+app.get("/health", (req: Request, res: Response) => {
+   return res.status(200).json({
+      status: "ok",
+      message: "Connection OK",
+      timestamp: new Date().toISOString(),
+      uptime: process.uptime()
+   });
+});
 
 app.use('/api', rateLimiter({
    windowMs: 15 * 60 * 1000,
