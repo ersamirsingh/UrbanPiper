@@ -1,4 +1,4 @@
-import express from 'express';
+import express, { Express, Request, Response } from 'express';
 import cookieParser from 'cookie-parser';
 import cors from 'cors';
 import helmet from 'helmet';
@@ -9,10 +9,9 @@ initWorkerRegistry();
 import { errorHandler } from './middlewares/error.middleware.js';
 import { rateLimiter } from './middlewares/rateLimiter.middleware.js';
 
-const app = express();
+const app: Express = express();
 
 app.use(helmet());
-
 
 app.use(cors({
    credentials: true,
@@ -21,7 +20,11 @@ app.use(cors({
          return callback(null, true);
       }
 
-      if (origin === process.env.CLIENT_URL) {
+      if (
+         origin === process.env.CLIENT_URL ||
+         origin.includes('localhost') ||
+         origin.includes('127.0.0.1')
+      ) {
          return callback(null, true);
       }
 
@@ -29,16 +32,18 @@ app.use(cors({
    }
 }));
 
-
 app.use(express.json());
-app.use(cookieParser())
+app.use(cookieParser());
 
+app.get("/health", (req: Request, res: Response) => {
+   return res.status(200).json({
+      status: "ok",
+      message: "Connection OK",
+      timestamp: new Date().toISOString(),
+      uptime: process.uptime()
+   });
+});
 
-app.get("/", (req, res) => {
-   res.json({ connection: "OK" });
-})
-
-// Apply global rate limiter to all api routes: 100 requests per 15 minutes
 app.use('/api', rateLimiter({
    windowMs: 15 * 60 * 1000,
    max: 200,
@@ -47,7 +52,6 @@ app.use('/api', rateLimiter({
 
 app.use('/api', router);
 
-// Global Error Handler
 app.use(errorHandler);
 
 export default app;

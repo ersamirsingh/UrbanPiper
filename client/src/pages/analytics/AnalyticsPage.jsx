@@ -329,7 +329,6 @@ function ChannelVolumeChart({ data = [] }) {
     ONLINE: '#8b5cf6',
     SWIGGY: '#f97316',
     ZOMATO: '#ef4444',
-    WEBSITE: '#ec4899',
   };
 
   const getChannelColor = (c) => channelColors[c] || '#9ca3af';

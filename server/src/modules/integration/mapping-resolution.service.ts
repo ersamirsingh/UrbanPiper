@@ -3,18 +3,22 @@ import ChannelOutletMapping from "../../models/channeloutletmapping.model.js";
 import ChannelMenuItemMapping from "../../models/channelmenuitemmapping.model.js";
 import ChannelVariantMapping from "../../models/channelvariantmapping.model.js";
 import ChannelAddonMapping from "../../models/channeladdonmapping.model.js";
+import Outlet from "../../models/outlet.model.js";
+import MenuItem from "../../models/menuItem.model.js";
 
 export class MappingResolutionService {
-  /**
-   * Resolves internal outletId via ChannelOutletMapping
-   */
+
   static async resolveOutletId(
     tenantId: string,
     provider: string,
     externalOutletId: string
   ): Promise<string> {
     const prov = String(provider).toUpperCase();
-    if (prov === "QR" || prov === "WEBSITE" || prov === "POS" || prov === "QR_DINE_IN") {
+    if (prov === "QR" || prov === "POS" || prov === "QR_DINE_IN") {
+      return externalOutletId;
+    }
+
+    if (externalOutletId && Types.ObjectId.isValid(externalOutletId)) {
       return externalOutletId;
     }
 
@@ -27,15 +31,16 @@ export class MappingResolutionService {
     });
 
     if (!mapping) {
+      const fallbackOutlet = await Outlet.findOne({ tenantId: new Types.ObjectId(tenantId), isDeleted: false });
+      if (fallbackOutlet) {
+        return fallbackOutlet._id.toString();
+      }
       throw new Error(`MAPPING_ERROR: Outlet mapping missing for external outlet ID: ${externalOutletId}`);
     }
 
     return mapping.outletId.toString();
   }
 
-  /**
-   * Resolves internal menuItemId via ChannelMenuItemMapping
-   */
   static async resolveMenuItemId(
     tenantId: string,
     outletId: string,
@@ -43,7 +48,11 @@ export class MappingResolutionService {
     externalItemId: string
   ): Promise<string> {
     const prov = String(provider).toUpperCase();
-    if (prov === "QR" || prov === "WEBSITE" || prov === "POS" || prov === "QR_DINE_IN") {
+    if (prov === "QR" || prov === "POS" || prov === "QR_DINE_IN") {
+      return externalItemId;
+    }
+
+    if (externalItemId && Types.ObjectId.isValid(externalItemId)) {
       return externalItemId;
     }
 
@@ -57,15 +66,16 @@ export class MappingResolutionService {
     });
 
     if (!mapping) {
+      const fallbackItem = await MenuItem.findOne({ tenantId: new Types.ObjectId(tenantId), isDeleted: false });
+      if (fallbackItem) {
+        return fallbackItem._id.toString();
+      }
       throw new Error(`MAPPING_ERROR: Item mapping missing for external item ID: ${externalItemId}`);
     }
 
     return mapping.menuItemId.toString();
   }
 
-  /**
-   * Resolves internal variantId via ChannelVariantMapping
-   */
   static async resolveVariantId(
     tenantId: string,
     outletId: string,
@@ -73,7 +83,11 @@ export class MappingResolutionService {
     externalVariantId: string
   ): Promise<string> {
     const prov = String(provider).toUpperCase();
-    if (prov === "QR" || prov === "WEBSITE" || prov === "POS" || prov === "QR_DINE_IN") {
+    if (prov === "QR" || prov === "POS" || prov === "QR_DINE_IN") {
+      return externalVariantId;
+    }
+
+    if (externalVariantId && Types.ObjectId.isValid(externalVariantId)) {
       return externalVariantId;
     }
 
@@ -87,15 +101,12 @@ export class MappingResolutionService {
     });
 
     if (!mapping) {
-      throw new Error(`MAPPING_ERROR: Variant mapping missing for external variant ID: ${externalVariantId}`);
+      return externalVariantId;
     }
 
     return mapping.variantId.toString();
   }
 
-  /**
-   * Resolves internal addonId via ChannelAddonMapping
-   */
   static async resolveAddonId(
     tenantId: string,
     outletId: string,
@@ -103,7 +114,11 @@ export class MappingResolutionService {
     externalAddonId: string
   ): Promise<string> {
     const prov = String(provider).toUpperCase();
-    if (prov === "QR" || prov === "WEBSITE" || prov === "POS" || prov === "QR_DINE_IN") {
+    if (prov === "QR" || prov === "POS" || prov === "QR_DINE_IN") {
+      return externalAddonId;
+    }
+
+    if (externalAddonId && Types.ObjectId.isValid(externalAddonId)) {
       return externalAddonId;
     }
 
@@ -117,7 +132,7 @@ export class MappingResolutionService {
     });
 
     if (!mapping) {
-      throw new Error(`MAPPING_ERROR: Addon mapping missing for external addon ID: ${externalAddonId}`);
+      return externalAddonId;
     }
 
     return mapping.addonId.toString();

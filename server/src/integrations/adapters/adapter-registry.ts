@@ -11,7 +11,6 @@ const mockZomato = new MockZomatoAdapter();
 const qrAdapter = new QrAdapter();
 const websiteAdapter = new WebsiteAdapter();
 
-// Register with static OrderGatewayService registry
 OrderGatewayService.registerAdapter(mockSwiggy);
 OrderGatewayService.registerAdapter(mockZomato);
 OrderGatewayService.registerAdapter(qrAdapter);
@@ -23,7 +22,7 @@ localRegistry.set(IntegrationProvider.SWIGGY, mockSwiggy);
 localRegistry.set(IntegrationProvider.MOCK_ZOMATO, mockZomato);
 localRegistry.set(IntegrationProvider.ZOMATO, mockZomato);
 localRegistry.set(IntegrationProvider.QR, qrAdapter);
-localRegistry.set(IntegrationProvider.WEBSITE, websiteAdapter);
+localRegistry.set("WEBSITE", websiteAdapter);
 
 export function getAdapter(provider: string): IntegrationAdapter {
   const key = String(provider).toUpperCase();

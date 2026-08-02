@@ -2,11 +2,10 @@ import { BaseAdapter } from "./base.adapter.js";
 import {
   AdapterNormalizeOrderArgs,
   CanonicalOrder,
-  IntegrationProvider
 } from "../../types/integration.type.js";
 
 export class WebsiteAdapter extends BaseAdapter {
-  provider = IntegrationProvider.WEBSITE;
+  provider = "WEBSITE";
 
   async normalizeOrder(args: AdapterNormalizeOrderArgs): Promise<CanonicalOrder> {
     const payload = args.payload as any;
@@ -16,7 +15,7 @@ export class WebsiteAdapter extends BaseAdapter {
     }
 
     return {
-      source: "WEBSITE",
+      source: "CUSTOM",
       provider: this.provider,
       externalOrderId: String(payload.orderId),
       tenantId: args.tenantId,
@@ -37,7 +36,7 @@ export class WebsiteAdapter extends BaseAdapter {
       },
       fulfillment: {
         type: payload.fulfillment?.type || "DELIVERY",
-        ...(payload.fulfillment?.scheduledFor ? { 
+        ...(payload.fulfillment?.scheduledFor ? {
           expectedPickupAt: new Date(payload.fulfillment.scheduledFor).toISOString(),
           scheduledFor: new Date(payload.fulfillment.scheduledFor)
         } : {}),

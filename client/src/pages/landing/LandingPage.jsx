@@ -36,6 +36,8 @@ import {
 import ProductShowcase from '../../components/landing/ProductShowcase';
 import ThemedImage from '../../components/landing/ThemedImage';
 import api from '../../api/axios';
+import { getPublicLandingStatsApi, getPublicTeamApi } from '../../api/models/public.api';
+
 
 const TwitterIcon = (props) => (
   <svg
@@ -85,7 +87,15 @@ const InstagramIcon = (props) => (
 
 // ── Interactive HTML/CSS Mock Visual Components ──
 
-function HeroDashboardMock() {
+function HeroDashboardMock({ stats }) {
+  const salesDisplay = stats?.metrics?.totalSales ? `₹${Number(stats.metrics.totalSales).toLocaleString('en-IN')}` : "₹1,42,850";
+  const activeOrdersCount = stats?.metrics?.activeOrdersCount ?? 42;
+  const slaText = stats?.metrics?.averageSla || "97.8%";
+  const recentOrders = stats?.recentOrders?.length ? stats.recentOrders : [
+    { orderNumber: "#OM-1025", orderType: "2x Paneer Tikka • Table 5", status: "PREPARING" },
+    { orderNumber: "#OM-1024", orderType: "1x Butter Chicken • Swiggy", status: "READY" }
+  ];
+
   return (
     <div className="w-full h-full bg-slate-950 text-slate-100 p-4 font-sans text-[11px] flex flex-col justify-between">
       {/* Mini Header */}
@@ -104,17 +114,17 @@ function HeroDashboardMock() {
       <div className="grid grid-cols-3 gap-2 mb-2">
         <div className="bg-slate-900/80 p-2 rounded-lg border border-slate-800 flex flex-col justify-between">
           <span className="text-slate-400 text-[9px]">Today's Sales</span>
-          <span className="text-xs font-bold text-white mt-0.5">₹1,42,850</span>
+          <span className="text-xs font-bold text-white mt-0.5">{salesDisplay}</span>
           <span className="text-[8px] text-emerald-400 font-bold">+18.2%</span>
         </div>
         <div className="bg-slate-900/80 p-2 rounded-lg border border-slate-800 flex flex-col justify-between">
           <span className="text-slate-400 text-[9px]">Active Orders</span>
-          <span className="text-xs font-bold text-white mt-0.5">42</span>
-          <span className="text-[8px] text-slate-400">Connaught Pl.</span>
+          <span className="text-xs font-bold text-white mt-0.5">{activeOrdersCount}</span>
+          <span className="text-[8px] text-slate-400">Aggregated</span>
         </div>
         <div className="bg-slate-900/80 p-2 rounded-lg border border-slate-800 flex flex-col justify-between">
           <span className="text-slate-400 text-[9px]">Average SLA</span>
-          <span className="text-xs font-bold text-white mt-0.5">97.8%</span>
+          <span className="text-xs font-bold text-white mt-0.5">{slaText}</span>
           <span className="text-[8px] text-emerald-400 font-bold">On Track</span>
         </div>
       </div>
@@ -125,20 +135,17 @@ function HeroDashboardMock() {
         <div className="col-span-3 bg-slate-900/50 p-2 rounded-lg border border-slate-800 flex flex-col justify-between">
           <span className="font-bold text-slate-300 mb-1">Live Order Flow</span>
           <div className="space-y-1">
-            <div className="flex justify-between items-center p-1.5 rounded bg-slate-900/80 border border-slate-800">
-              <div>
-                <span className="font-bold text-white block">#OM-1025</span>
-                <span className="text-[8px] text-slate-400">2x Paneer Tikka • Table 5</span>
+            {recentOrders.slice(0, 2).map((ord, idx) => (
+              <div key={idx} className="flex justify-between items-center p-1.5 rounded bg-slate-900/80 border border-slate-800">
+                <div>
+                  <span className="font-bold text-white block">{ord.orderNumber}</span>
+                  <span className="text-[8px] text-slate-400">{ord.orderType}</span>
+                </div>
+                <span className={`px-1.5 py-0.5 text-[8px] rounded ${ord.status === 'PREPARING' ? 'bg-amber-500/20 text-amber-400' : 'bg-blue-500/20 text-blue-400'}`}>
+                  {ord.status}
+                </span>
               </div>
-              <span className="px-1.5 py-0.5 text-[8px] bg-amber-500/20 text-amber-400 rounded">Preparing</span>
-            </div>
-            <div className="flex justify-between items-center p-1.5 rounded bg-slate-900/80 border border-slate-800">
-              <div>
-                <span className="font-bold text-white block">#OM-1024</span>
-                <span className="text-[8px] text-slate-400">1x Butter Chicken • Swiggy</span>
-              </div>
-              <span className="px-1.5 py-0.5 text-[8px] bg-blue-500/20 text-blue-400 rounded">Ready</span>
-            </div>
+            ))}
           </div>
         </div>
 
@@ -168,6 +175,7 @@ function HeroDashboardMock() {
     </div>
   );
 }
+
 
 function IntegrationsDeviceMockup() {
   return (
@@ -406,7 +414,13 @@ function OrderJourneyMock() {
   );
 }
 
-function StaffMgmtMock() {
+function StaffMgmtMock({ team }) {
+  const staffList = team?.length ? team : [
+    { name: 'Md Yusuf', role: 'Full Stack & System Architect', email: 'yusuf@omniserve.io', scope: 'Global', initial: 'MY', badgeBg: 'bg-indigo-500/10 text-indigo-400' },
+    { name: 'Samir Singh', role: 'Operations Manager Lead', email: 'samir@omniserve.io', scope: 'Regional', initial: 'SS', badgeBg: 'bg-blue-500/10 text-blue-400' },
+    { name: 'Nitish Kumar', role: 'Kitchen Lead Specialist', email: 'nitish@omniserve.io', scope: 'Delhi CP', initial: 'NK', badgeBg: 'bg-emerald-500/10 text-emerald-400' }
+  ];
+
   return (
     <div className="w-full h-full bg-slate-950 text-slate-200 p-4 font-sans text-xs flex flex-col justify-between">
       <div className="flex justify-between items-center border-b border-slate-800 pb-2 mb-2">
@@ -430,42 +444,30 @@ function StaffMgmtMock() {
             </tr>
           </thead>
           <tbody className="divide-y divide-slate-850/40">
-            <tr>
-              <td className="py-1.5 flex items-center gap-1.5">
-                <div className="w-5 h-5 rounded-full bg-indigo-600 flex items-center justify-center font-bold text-white text-[8px]">MY</div>
-                <div>
-                  <span className="font-bold text-white block">Md Yusuf</span>
-                  <span className="text-[8px] text-slate-400">yusuf@omniserve.io</span>
-                </div>
-              </td>
-              <td className="py-1.5 text-slate-300 text-[9px]">Super Admin</td>
-              <td className="py-1.5"><span className="px-1.5 py-0.5 rounded bg-indigo-500/10 text-indigo-400 font-semibold text-[8px]">Global</span></td>
-              <td className="py-1.5"><span className="inline-flex items-center gap-1"><span className="w-1 h-1 bg-emerald-500 rounded-full"></span> Active</span></td>
-            </tr>
-            <tr>
-              <td className="py-1.5 flex items-center gap-1.5">
-                <div className="w-5 h-5 rounded-full bg-blue-600 flex items-center justify-center font-bold text-white text-[8px]">SS</div>
-                <div>
-                  <span className="font-bold text-white block">Samir Singh</span>
-                  <span className="text-[8px] text-slate-400">samir@omniserve.io</span>
-                </div>
-              </td>
-              <td className="py-1.5 text-slate-300 text-[9px]">Operations Mgr</td>
-              <td className="py-1.5"><span className="px-1.5 py-0.5 rounded bg-blue-500/10 text-blue-400 font-semibold text-[8px]">Indiranagar</span></td>
-              <td className="py-1.5"><span className="inline-flex items-center gap-1"><span className="w-1 h-1 bg-emerald-500 rounded-full"></span> Active</span></td>
-            </tr>
-            <tr>
-              <td className="py-1.5 flex items-center gap-1.5">
-                <div className="w-5 h-5 rounded-full bg-emerald-600 flex items-center justify-center font-bold text-white text-[8px]">NK</div>
-                <div>
-                  <span className="font-bold text-white block">Nitish Kumar</span>
-                  <span className="text-[8px] text-slate-400">nitish@omniserve.io</span>
-                </div>
-              </td>
-              <td className="py-1.5 text-slate-300 text-[9px]">Kitchen Lead</td>
-              <td className="py-1.5"><span className="px-1.5 py-0.5 rounded bg-emerald-500/10 text-emerald-400 font-semibold text-[8px]">Delhi CP</span></td>
-              <td className="py-1.5"><span className="inline-flex items-center gap-1"><span className="w-1 h-1 bg-emerald-500 rounded-full"></span> Active</span></td>
-            </tr>
+            {staffList.map((member, idx) => (
+              <tr key={idx}>
+                <td className="py-1.5 flex items-center gap-1.5">
+                  <div className="w-5 h-5 rounded-full bg-indigo-600 flex items-center justify-center font-bold text-white text-[8px]">
+                    {member.initial || member.name?.substring(0, 2).toUpperCase()}
+                  </div>
+                  <div>
+                    <span className="font-bold text-white block">{member.name}</span>
+                    <span className="text-[8px] text-slate-400">{member.email}</span>
+                  </div>
+                </td>
+                <td className="py-1.5 text-slate-300 text-[9px]">{member.role}</td>
+                <td className="py-1.5">
+                  <span className={`px-1.5 py-0.5 rounded font-semibold text-[8px] ${member.badgeBg || 'bg-indigo-500/10 text-indigo-400'}`}>
+                    {member.scope || 'Active'}
+                  </span>
+                </td>
+                <td className="py-1.5">
+                  <span className="inline-flex items-center gap-1">
+                    <span className="w-1 h-1 bg-emerald-500 rounded-full"></span> Active
+                  </span>
+                </td>
+              </tr>
+            ))}
           </tbody>
         </table>
       </div>
@@ -475,12 +477,25 @@ function StaffMgmtMock() {
 
 export default function LandingPage() {
   const { theme, selectTheme } = useTheme();
+  const [statsData, setStatsData] = useState(null);
+  const [teamData, setTeamData] = useState([]);
 
-  const heroStats = [
+  useEffect(() => {
+    getPublicLandingStatsApi()
+      .then(res => setStatsData(res.data?.data))
+      .catch(err => console.error("[LandingPage] Stats fetch error:", err));
+
+    getPublicTeamApi()
+      .then(res => setTeamData(res.data?.data || []))
+      .catch(err => console.error("[LandingPage] Team fetch error:", err));
+  }, []);
+
+  const heroStats = statsData?.heroStats || [
     { value: "40%+", label: "Order Speedup" },
     { value: "99.99%", label: "System Uptime" },
     { value: "15k+", label: "Happy Merchants" }
   ];
+
 
   const { addToast } = useToast();
   const [themeOpen, setThemeOpen] = useState(false);
@@ -1046,16 +1061,26 @@ export default function LandingPage() {
           <h2 className="font-headline-xl text-headline-xl mb-4 font-bold">The Minds Behind OmniServe</h2>
           <p className="text-on-surface/75 dark:text-zinc-300">Experts in operations, scale engineering, and product systems.</p>
         </div>
-        <div className="max-w-container-max mx-auto px-margin-desktop grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 reveal">
-          {teamMembers.map((member) => (
+        <div className="max-w-container-max mx-auto px-margin-desktop grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8 reveal">
+          {(teamData.length ? teamData : [
+            { name: 'Md Yusuf', role: 'Full stack and System architecture engineer', image: '/images/landingpage/team/yusuf.jpeg' },
+            { name: 'Samir Singh', role: 'Full stack and DevOps engineer', image: '/images/landingpage/team/samir.jpeg' },
+            { name: 'Nitish Kumar', role: 'Frontend Lead & UI/UX Specialist', image: '/images/landingpage/team/nitish.jpeg' }
+          ]).map((member) => (
             <div key={member.name} className="text-center group bg-white/30 dark:bg-zinc-900/30 p-6 rounded-3xl border border-gray-100 dark:border-zinc-800 transition-all hover:-translate-y-1">
               <div className="w-40 h-40 mx-auto mb-6 relative">
                 <div className="absolute inset-0 bg-[#6311f4]/15 rounded-full group-hover:scale-105 transition-transform duration-500"></div>
-                <img
-                  className="w-32 h-32 rounded-full mx-auto relative top-4 object-cover"
-                  src={member.image}
-                  alt={member.name}
-                />
+                {member.image ? (
+                  <img
+                    className="w-32 h-32 rounded-full mx-auto relative top-4 object-cover"
+                    src={member.image}
+                    alt={member.name}
+                  />
+                ) : (
+                  <div className="w-32 h-32 rounded-full mx-auto relative top-4 bg-indigo-600 text-white flex items-center justify-center font-bold text-2xl">
+                    {member.initial || member.name.substring(0, 2).toUpperCase()}
+                  </div>
+                )}
               </div>
               <h4 className="font-bold text-lg dark:text-zinc-100">{member.name}</h4>
               <p className="text-xs text-[#6311f4] dark:text-[#a07cff] font-bold uppercase tracking-wider mt-1.5">{member.role}</p>
@@ -1063,6 +1088,7 @@ export default function LandingPage() {
           ))}
         </div>
       </section>
+
 
       {/* Testimonials */}
       <section className="py-section-gap bg-surface-container-low dark:bg-zinc-950/20 transition-colors duration-300">

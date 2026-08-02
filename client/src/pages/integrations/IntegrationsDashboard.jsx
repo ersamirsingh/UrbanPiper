@@ -365,7 +365,6 @@ export default function IntegrationsDashboard() {
     { id: 'ondc', name: 'ONDC Gateway', provider: 'ONDC', logo: '🛍️' },
     { id: 'magicpin', name: 'Magicpin', provider: 'MAGICPIN', logo: '📍' },
     { id: 'whatsapp', name: 'WhatsApp Shop', provider: 'WHATSAPP', logo: '💬' },
-    { id: 'website', name: 'Store Website', provider: 'WEBSITE', logo: '💻' },
     { id: 'dunzo', name: 'Dunzo Delivery', provider: 'DUNZO', logo: '⚡' },
     { id: 'porter', name: 'Porter Delivery', provider: 'PORTER', logo: '🚚' },
   ];
@@ -744,7 +743,6 @@ export default function IntegrationsDashboard() {
                 <option value="QR">QR Dine-in</option>
                 <option value="SWIGGY">Swiggy</option>
                 <option value="ZOMATO">Zomato</option>
-                <option value="WEBSITE">Website</option>
                 <option value="SYSTEM">System Engine</option>
               </select>
             </div>

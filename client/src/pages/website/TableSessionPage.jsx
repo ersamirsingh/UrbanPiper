@@ -344,12 +344,11 @@ export default function TableSessionPage() {
                 ) : selectedMethod === "CARD" ? (
                   <div className="bg-zinc-950 border border-zinc-850 p-4 rounded-xl space-y-4">
                     <div className="space-y-2">
-                      <span className="text-[10px] font-bold text-zinc-500 uppercase tracking-wider block">Mock Card Number</span>
+                      <span className="text-[10px] font-bold text-zinc-500 uppercase tracking-wider block">Card Number</span>
                       <input
                         type="text"
-                        placeholder="4111 2222 3333 4444"
-                        disabled
-                        className="w-full bg-zinc-900 border border-zinc-800 rounded-lg p-2 text-xs font-mono text-zinc-300"
+                        placeholder="•••• •••• •••• ••••"
+                        className="w-full bg-zinc-900 border border-zinc-800 rounded-lg p-2 text-xs font-mono text-zinc-300 focus:outline-none focus:border-indigo-500"
                       />
                     </div>
                     <div className="w-full flex gap-2">
@@ -359,7 +358,7 @@ export default function TableSessionPage() {
                         disabled={processing}
                         className="flex-1 py-2 rounded-xl text-xs font-bold bg-indigo-600"
                       >
-                        {processing ? "Processing..." : "Tap / Pay Now"}
+                        {processing ? "Processing..." : "Pay Now"}
                       </Button>
                       <Button
                         variant="outline"
@@ -406,8 +405,9 @@ export default function TableSessionPage() {
                       <span className="text-blue-400 group-hover:scale-110 transition-all text-base"><HiOutlineCreditCard /></span>
                       <span className="text-xs font-bold text-white">Credit / Debit Card</span>
                     </div>
-                    <span className="text-[10px] text-zinc-500 font-semibold uppercase tracking-wider bg-zinc-800 px-2 py-0.5 rounded-md">Mock Pin</span>
+                    <span className="text-[10px] text-blue-400 font-bold uppercase tracking-wider bg-blue-500/10 px-2 py-0.5 rounded-md">Secure Pay</span>
                   </button>
+
 
                   <button
                     onClick={() => handlePay("CASH")}

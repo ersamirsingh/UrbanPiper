@@ -66,6 +66,9 @@ export default function RestaurantOperationsDashboard({ onNavigate }) {
       const totalTasks = tasks.length;
       const waiterSLA = totalTasks > 0 ? Math.round(((totalTasks - escalatedTasks) / totalTasks) * 100) : 100;
 
+      const kdsFiredCount = kdsItems.filter(i => i.firedAt).length;
+      const kdsComplianceCalc = kdsItems.length > 0 ? Math.round((kdsFiredCount / kdsItems.length) * 100) : 100;
+
       setStats({
         activeTables: active,
         availableTables: Math.max(0, available),
@@ -74,10 +77,12 @@ export default function RestaurantOperationsDashboard({ onNavigate }) {
         readyOrders: readyCount,
         waitingBills: billingRequested,
         pendingTasks: openTasks,
-        kdsCompliance: 96, // Mock target
+        kdsCompliance: kdsComplianceCalc,
         waiterCompliance: waiterSLA,
         shiftName: shift?.shiftName ? `${shift.shiftName} Shift` : 'No Active Shift'
       });
+
+
     } catch (err) {
       console.error('[OperationsDashboard] Error fetching operational stats:', err);
     } finally {

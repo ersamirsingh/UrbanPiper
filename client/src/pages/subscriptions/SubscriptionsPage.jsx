@@ -205,7 +205,7 @@ export default function SubscriptionsPage() {
           listAllSubscriptionsApi(params),
           listAllInvoicesApi()
         ]);
-        setPlans(plansRes.data?.data?.plans?.length ? plansRes.data.data.plans : FALLBACK_PLANS);
+        setPlans(plansRes.data?.data?.plans || []);
         setAnalytics(analyticsRes.data?.data || null);
         setAllSubscriptions(subsRes.data?.data?.subscriptions || []);
         setAllInvoices(invoicesRes.data?.data?.invoices || []);
@@ -219,16 +219,17 @@ export default function SubscriptionsPage() {
         setMySubscription(subRes.data?.data?.subscription || null);
         setUsage(usageRes.data?.data?.usage || null);
         setInvoices(invoiceRes.data?.data?.invoices || []);
-        setPlans(plansRes.data?.data?.plans?.length ? plansRes.data.data.plans : FALLBACK_PLANS);
+        setPlans(plansRes.data?.data?.plans || []);
       }
     } catch (err) {
-      console.error(err);
-      setPlans(FALLBACK_PLANS);
-      addToast('Displaying cached plans.', 'warning');
+      console.error("[SubscriptionsPage] Error fetching subscription data:", err);
+      setPlans([]);
+      addToast('Failed to load live subscription plans.', 'error');
     } finally {
       setLoading(false);
     }
   };
+
 
   useEffect(() => {
     fetchData();

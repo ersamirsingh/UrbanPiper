@@ -5,7 +5,7 @@ export interface IChannelSession extends Document {
   tenantId: Types.ObjectId;
   outletId: Types.ObjectId;
   sessionToken: string;
-  channel: "WEBSITE" | "QR" | "SWIGGY" | "ZOMATO" | "WHATSAPP";
+  channel: "QR" | "SWIGGY" | "ZOMATO" | "WHATSAPP";
   menuViewedAt?: Date | null;
   firstItemViewedAt?: Date | null;
   firstAddToCartAt?: Date | null;
@@ -42,7 +42,7 @@ const channelSessionSchema = new Schema<IChannelSession>(
     channel: {
       type: String,
       enum: {
-        values: ["WEBSITE", "QR", "SWIGGY", "ZOMATO", "WHATSAPP"],
+        values: ["QR", "SWIGGY", "ZOMATO", "WHATSAPP"],
         message: "Invalid channel: {VALUE}",
       },
       required: [true, "Channel is required"],
@@ -69,12 +69,10 @@ const channelSessionSchema = new Schema<IChannelSession>(
   }
 );
 
-// Indexes
 channelSessionSchema.index({ tenantId: 1 });
 channelSessionSchema.index({ outletId: 1 });
 channelSessionSchema.index({ isDeleted: 1 });
 
-// Generate unique sessionToken pre-save if not provided
 channelSessionSchema.pre("save", function (this: IChannelSession, next) {
   if (!this.sessionToken) {
     this.sessionToken = "CH-SESS-" + crypto.randomBytes(16).toString("hex").toUpperCase();

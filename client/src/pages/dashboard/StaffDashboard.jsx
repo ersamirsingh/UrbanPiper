@@ -77,8 +77,6 @@ export default function StaffDashboard() {
                               ? 'bg-red-50 text-red-600 dark:bg-red-950/20 dark:text-red-400 border border-red-100 dark:border-red-900/30'
                               : order.source === 'QR_DINE_IN'
                               ? 'bg-teal-50 text-teal-650 dark:bg-teal-950/20 dark:text-teal-450 border border-teal-100 dark:border-teal-900/30'
-                              : order.source === 'WEBSITE'
-                              ? 'bg-indigo-50 text-indigo-600 dark:bg-indigo-950/20 dark:text-indigo-400 border border-indigo-100 dark:border-indigo-900/30'
                               : 'bg-zinc-100 text-zinc-650 dark:bg-zinc-800 dark:text-zinc-400 border border-zinc-250 dark:border-zinc-700/50'
                           }`}>
                             {order.source.replace('_', ' ')}

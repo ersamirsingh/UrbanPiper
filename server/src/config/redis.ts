@@ -5,7 +5,6 @@ let redisReady = false;
 let reconnectAttempts = 0;
 const MAX_RECONNECT_ATTEMPTS = 10;
 
-
 export function isRedisReady(): boolean {
   return redisReady && redisClient !== null && (redisClient as RedisClientType).isOpen;
 }
@@ -19,35 +18,47 @@ const connectRedis = async (): Promise<RedisClientType | null> => {
   if (redisClient && (redisClient as RedisClientType).isOpen) {
     return redisClient as RedisClientType;
   }
-  if (!process.env.REDIS_PASSWORD || !process.env.REDIS_HOST || !process.env.REDIS_PORT) {
-    console.warn('[Redis] Environment variables missing (REDIS_HOST / REDIS_PORT / REDIS_PASSWORD). Running without cache.');
+  const rawUrl = process.env.REDIS_URL ? process.env.REDIS_URL.trim() : '';
+  const validRedisUrl = rawUrl.startsWith('redis://') || rawUrl.startsWith('rediss://') ? rawUrl : undefined;
+
+  const host = process.env.REDIS_HOST && process.env.REDIS_HOST.trim() !== '' ? process.env.REDIS_HOST.trim() : (validRedisUrl ? undefined : 'localhost');
+  const port = process.env.REDIS_PORT ? Number(process.env.REDIS_PORT) : 6379;
+
+  if (!validRedisUrl && !process.env.REDIS_HOST) {
+    console.warn('[Redis] Neither REDIS_URL nor REDIS_HOST provided. Running without cache.');
     return null;
   }
 
   try {
     if (!redisClient) {
-      redisClient = createClient({
-        username: process.env.REDIS_USERNAME,
-        password: process.env.REDIS_PASSWORD,
-        socket: {
-          host: process.env.REDIS_HOST,
-          port: Number(process.env.REDIS_PORT),
+      const clientConfig: any = validRedisUrl
+        ? { url: validRedisUrl }
+        : {
+            username: process.env.REDIS_USERNAME || undefined,
+            password: process.env.REDIS_PASSWORD || undefined,
+            socket: {
+              host,
+              port,
+            },
+          };
 
-          reconnectStrategy: (retries: number) => {
-            reconnectAttempts = retries;
-            if (retries >= MAX_RECONNECT_ATTEMPTS) {
-              console.error(`[Redis] Giving up after ${MAX_RECONNECT_ATTEMPTS} reconnect attempts. Cache disabled.`);
-              redisReady = false;
-              return false; // stop reconnecting
-            }
-            const delay = Math.min(retries * 200, 5000); // cap at 5 s
-            console.warn(`[Redis] Reconnecting in ${delay}ms (attempt ${retries + 1}/${MAX_RECONNECT_ATTEMPTS})...`);
-            return delay;
-          },
+      clientConfig.socket = {
+        ...(clientConfig.socket || {}),
+        reconnectStrategy: (retries: number) => {
+          reconnectAttempts = retries;
+          if (retries >= MAX_RECONNECT_ATTEMPTS) {
+            console.error(`[Redis] Giving up after ${MAX_RECONNECT_ATTEMPTS} reconnect attempts. Cache disabled.`);
+            redisReady = false;
+            return false;
+          }
+          const delay = Math.min(retries * 200, 5000);
+          console.warn(`[Redis] Reconnecting in ${delay}ms (attempt ${retries + 1}/${MAX_RECONNECT_ATTEMPTS})...`);
+          return delay;
         },
-      } as any);
+      };
 
-      // ── Event Listeners ──────────────────────────────────────────────────────
+      redisClient = createClient(clientConfig);
+
       redisClient.on('error', (err: Error) => {
         console.error('[Redis] Client error:', err.message);
         redisReady = false;

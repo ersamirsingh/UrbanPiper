@@ -11,7 +11,7 @@ import Badge from '../../components/ui/Badge';
 import Modal from '../../components/ui/Modal';
 import PageHeader from '../../components/ui/PageHeader';
 import { useToast } from '../../components/ui/Toast';
-import { ORDER_STATUS_VARIANT, ORDER_STATUS_LABELS, PAYMENT_STATUS_VARIANT, USER_ROLES } from '../../utils/constants';
+import { ORDER_STATUS_VARIANT, ORDER_STATUS_LABELS, PAYMENT_STATUS_VARIANT, USER_ROLES, ORDER_SOURCE_LABELS, ORDER_SOURCE_BADGES } from '../../utils/constants';
 import { getList, getEntityId, getRefId } from '../../utils/apiData';
 import { HiOutlineShoppingCart, HiOutlineEye, HiOutlineXMark, HiOutlineClock, HiOutlineArrowPath } from 'react-icons/hi2';
 import { useSocket } from '../../context/SocketContext';
@@ -220,7 +220,12 @@ export default function OrdersPage({ mode = 'ALL', hideHeader = false, viewType 
     { 
       key: 'source', 
       label: 'Source', 
-      render: (r) => <Badge variant="neutral">{r.source?.replace('_', ' ')}</Badge> 
+      render: (r) => {
+        const src = r.source?.toUpperCase();
+        const label = ORDER_SOURCE_LABELS[src] || r.source?.replace('_', ' ') || 'Direct';
+        const badgeVar = ORDER_SOURCE_BADGES[src] || 'neutral';
+        return <Badge variant={badgeVar}>{label}</Badge>;
+      } 
     },
     { 
       key: 'totalAmount', 
